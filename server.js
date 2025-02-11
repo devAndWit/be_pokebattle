@@ -42,9 +42,4 @@ process.on("SIGTERM", () => {
     console.log("HTTP server closed");
   });
 });
-
-// server = app.listen(port, () =>
-//   console.log(
-//     chalk.red(` Personal Library API listening on port ${port}... `)
-//   )
-// );
+2
