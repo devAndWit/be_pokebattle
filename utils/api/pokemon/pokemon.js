@@ -1,4 +1,5 @@
 import axios from "axios";
+import ErrorPokemon from "../../error/errorPokemon.js";
 
 const pokeUrl = "https://pokeapi.co/api/v2";
 const pokePerPage = 20;
@@ -7,11 +8,10 @@ export async function fetchAllPokemon() {
   try {
     const allPokemon = await axios.get(`${pokeUrl}/pokemon?limit=100000`);
     if (!allPokemon) {
-      console.error("Fehler beim Abrufen der Pokémon:");
       return {
         data: "",
-        status: 200,
-        error: "",
+        status: 400,
+        error: "400: Fehler beim Abrufen der Pokémon.",
       };
     }
     return {
@@ -21,11 +21,10 @@ export async function fetchAllPokemon() {
       error: "",
     };
   } catch (error) {
-    console.error("Fehler beim Abrufen der Pokémon:", error);
     return {
       data: "",
       status: 500,
-      error: "keine Daten vorhanden",
+      error: "500 Fehler beim Abrufen der Pokémon:",
     };
   }
 }
@@ -39,11 +38,10 @@ export async function fetchAllPokemonPerPage(page = 1, perPage = pokePerPage) {
     );
 
     if (!pokemonList) {
-      console.error("Fehler beim Abrufen der Pokémon:");
       return {
         data: "",
         status: 400,
-        error: "keine Daten vorhanden",
+        error: "Fehler beim Abrufen der Pokémon:",
       };
     }
 
@@ -54,11 +52,11 @@ export async function fetchAllPokemonPerPage(page = 1, perPage = pokePerPage) {
       error: "",
     };
   } catch (error) {
-    console.error("Fehler beim Abrufen der Pokémon:", error);
+    
     return {
       data: "",
       status: 500,
-      error: "keine Daten vorhanden",
+      error: "Fehler beim Abrufen der Pokémon.",
     };
   }
 }
