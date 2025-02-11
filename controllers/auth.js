@@ -21,7 +21,7 @@ export const register = asyncHandler(async (req, res) => {
     const existingUser = await UserModel.findOne({email});
     if (existingUser) throw new ErrorResponse('User already exist', 400);
 
-    const user = await UserModel.create({email, password});
+    await UserModel.create({email, password});
     res.status(201).json({message: "User registered successfully"});
 });
 

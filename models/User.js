@@ -1,5 +1,4 @@
 import {model, Schema} from "mongoose";
-import async from "async";
 
 const UserSchema = new Schema({
     email: {
