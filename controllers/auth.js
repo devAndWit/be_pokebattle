@@ -16,7 +16,7 @@ const generateToken = async (userId) => {
     return {accessToken, refreshToken};
 };
 
-export const register = asyncHandler(async (req, res) => {
+export const registration = asyncHandler(async (req, res) => {
     const {email, password} = req.body;
     const existingUser = await UserModel.findOne({email});
     if (existingUser) throw new ErrorResponse('User already exist', 400);
