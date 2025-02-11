@@ -4,10 +4,13 @@ import asyncHandler from "../utils/handler/asyncHandler.js";
 import UserModel from "../models/User.js";
 import ErrorResponse from "../utils/error/ErrorResponse.js";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
 const generateToken = async (userId) => {
     const accessToken = await generateAccessToken(userId);
     const refreshToken = await generateRefreshToken(userId);
+
+    await TokenModel.deleteMany({userId})
 
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 1);
@@ -20,7 +23,6 @@ export const registration = asyncHandler(async (req, res) => {
     const {email, password} = req.body;
     const existingUser = await UserModel.findOne({email});
     if (existingUser) throw new ErrorResponse('User already exist', 400);
-
     await UserModel.create({email, password});
     res.status(201).json({message: "User registered successfully"});
 });
