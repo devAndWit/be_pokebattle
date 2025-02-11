@@ -8,24 +8,25 @@ export async function fetchAllPokemon() {
   try {
     const allPokemon = await axios.get(`${pokeUrl}/pokemon?limit=100000`);
     if (!allPokemon) {
-      return {
-        data: "",
-        status: 400,
-        error: "400: Fehler beim Abrufen der Pokémon.",
-      };
+      throw new Error("400: Keine Pokemondaten gefunden.");
     }
+
+    let data = [];
+    allPokemon.data.results.forEach((val) => {
+      data.push({
+        name: val.name,
+        url: val.url,
+        id: parseInt(val.url.match(/\/pokemon\/(\d+)\//)[1]),
+      });
+    });
+
     return {
-      data: allPokemon.data,
+      data: data,
       status: 200,
-      pokeCount: allPokemon.data.results.length,
-      error: "",
+      count: data.length,
     };
   } catch (error) {
-    return {
-      data: "",
-      status: 500,
-      error: "500 Fehler beim Abrufen der Pokémon:",
-    };
+    throw new Error("500: Fehler im Bearbeiten der Pokemondaten.", error);
   }
 }
 
@@ -38,45 +39,87 @@ export async function fetchAllPokemonPerPage(page = 1, perPage = pokePerPage) {
     );
 
     if (!pokemonList) {
-      return {
-        data: "",
-        status: 400,
-        error: "Fehler beim Abrufen der Pokémon:",
-      };
+      throw new Error("400: Keine Pokemondaten gefunden.");
     }
 
+    let data = [];
+    pokemonList.data.results.forEach((val) => {
+      data.push({
+        name: val.name,
+        url: val.url,
+        id: parseInt(val.url.match(/\/pokemon\/(\d+)\//)[1]),
+      });
+    });
+
     return {
-      data: pokemonList.data,
+      data: data,
       status: 200,
-      pokeCount: allPokemon.data.results.length,
-      error: "",
+      count: data.length,
     };
   } catch (error) {
-    
-    return {
-      data: "",
-      status: 500,
-      error: "Fehler beim Abrufen der Pokémon.",
-    };
+    throw new Error("500: Fehler im Bearbeiten der Pokemondaten.", error);
   }
 }
 
 export async function fetchPokemonById(id = 0) {
   try {
     const pokemon = await axios.get(`${pokeUrl}/pokemon/${id}`);
+
     if (!pokemon) {
-      return {
-        data: "",
-        status: 400,
-        error: "keine Daten vorhanden",
-      };
+      throw new Error("400: Pokemon nicht gefunden.");
     }
-    return { data: pokemon.data, status: 200, error: "" };
+
+    const poke_info = extractDataFromPokemonData(pokemon.data);
+
+    return { data: poke_info, status: 200 };
   } catch (error) {
-    return {
-      data: "",
-      status: 500,
-      error: "keine Daten vorhanden",
-    };
+    throw new Error(
+      `500: Fehler im Bearbeiten der Pokemondaten mit id ${id}`,
+      error
+    );
   }
+}
+
+function extractDataFromPokemonData(pokemon) {
+  let poke = {
+    id: pokemon.id,
+    name: pokemon.name,
+    base_xp: pokemon.base_experience,
+    species: pokemon.species.name,
+    weight: pokemon.weight,
+    height: pokemon.height,
+    abilities: pokemon.abilities.map((value, index) => {
+      return value.ability.name;
+    }),
+    sprites: {
+      images: {
+        dream_world: pokemon.sprites.other.dream_world.front_default,
+        home: pokemon.sprites.other.home.front_default,
+        artwork: pokemon.sprites.other["official-artwork"].front_default,
+      },
+      gifs: {
+        back_default: pokemon.sprites.other.showdown.back_default,
+        back_shiny: pokemon.sprites.other.showdown.back_shiny,
+        front_default: pokemon.sprites.other.showdown.front_default,
+        front_shiny: pokemon.sprites.other.showdown.front_shiny,
+      },
+    },
+    stats: pokemon.stats
+      .map((value, index) => {
+        let key = value.stat.name.replace("-", "_");
+        return {
+          [key]: value.base_stat,
+        };
+      })
+      .reduce((acc, stat) => {
+        const key = Object.keys(stat)[0];
+        acc[key] = stat[key];
+        return acc;
+      }, {}),
+    type: pokemon.types.map((value, index) => {
+      return value.type.name;
+    }),
+  };
+
+  return poke;
 }

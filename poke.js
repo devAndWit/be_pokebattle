@@ -6,4 +6,4 @@ import {
 
 // console.log(await fetchAllPokemon());
 // console.log(await fetchAllPokemonPerPage(2, 20));
-console.log(await fetchPokemonById(10));
+// console.log(await fetchPokemonById(300));
