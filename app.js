@@ -7,7 +7,7 @@ import errorHandler from "./utils/error/errorHandler.js";
 import ErrorResponse from "./utils/error/ErrorResponse.js";
 
 import authRouter from "./routes/authRoutes.js";
-
+import pokemonRouter from "./routes/pokemonApiRoutes.js";
 
 const app = express();
 const morganFormat = ":method :url :status :response-time ms";
@@ -32,7 +32,8 @@ app.use(
 app.use(express.json());
 
 // app.use('/{route}', {router});
-app.use("/api/auth", authRouter)
+app.use("/api/auth", authRouter);
+app.use("/api/pokemon", pokemonRouter);
 
 app.use("*", (req, res, next) => {
   next(new ErrorResponse(`Cannot find ${req.originalUrl}`, 404));

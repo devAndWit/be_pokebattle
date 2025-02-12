@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "poke": "node poke.js",
-    "dev": "node -r dotenv/config --watch server.js",
+    "dev": "node -r dotenv/config --watch server.js --host",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

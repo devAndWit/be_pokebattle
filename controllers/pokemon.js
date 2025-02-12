@@ -1,18 +1,19 @@
 import axios from "axios";
-import ErrorPokemon from "../../error/errorPokemon.js";
+import asyncHandler from "../utils/handler/asyncHandler.js";
+import ErrorResponse from "../utils/error/ErrorResponse.js";
 
 const pokeUrl = "https://pokeapi.co/api/v2";
 const pokePerPage = 20;
 
-export async function fetchAllPokemon() {
+export const fetchAllPokemon = asyncHandler(async (req, res) => {
   try {
     const allPokemon = await axios.get(`${pokeUrl}/pokemon?limit=100000`);
     if (!allPokemon) {
-      throw new Error("400: Keine Pokemondaten gefunden.");
+      throw new ErrorResponse("Keine Pokemondaten gefunden.", 400);
     }
 
     let data = [];
-    allPokemon.data.results.forEach((val) => {
+    await allPokemon.data.results.forEach((val) => {
       data.push({
         name: val.name,
         url: val.url,
@@ -20,58 +21,75 @@ export async function fetchAllPokemon() {
       });
     });
 
-    return {
-      data: data,
-      status: 200,
-      count: data.length,
-    };
-  } catch (error) {
-    throw new Error("500: Fehler im Bearbeiten der Pokemondaten.", error);
-  }
-}
+    const dataLength = data.length;
 
-export async function fetchAllPokemonPerPage(page = 1, perPage = pokePerPage) {
+    res.status(200).json({
+      message: "All data fetched.",
+      data,
+      dataLength,
+    });
+  } catch (error) {
+    throw new ErrorResponse("Fehler im Bearbeiten der Pokemondaten.", 500);
+  }
+});
+
+export const fetchAllPokemonPerPage = asyncHandler(async (req, res) => {
+  console.log("fetchAllPokemonPerPage");
+  const { page } = req.params;
+
+  const perPage = !req.params.perPage ? 20 : req.params.perPage;
+
+  console.log("page: ", page);
+  console.log("perPage: ", perPage);
+
   try {
-    let start = page * perPage;
+    let start = (page - 1) * perPage; // Offset korrekt berechnet
 
     const pokemonList = await axios.get(
-      `${pokeUrl}/pokemon?offset=${start}&?limit=${perPage}`
+      `${pokeUrl}/pokemon?offset=${start}&limit=${perPage}`
     );
 
-    if (!pokemonList) {
-      throw new Error("400: Keine Pokemondaten gefunden.");
+    if (!pokemonList || !pokemonList.data.results) {
+      throw new ErrorResponse("Keine Pokemondaten gefunden.", 400);
     }
 
-    let data = [];
-    pokemonList.data.results.forEach((val) => {
-      data.push({
-        name: val.name,
-        url: val.url,
-        id: parseInt(val.url.match(/\/pokemon\/(\d+)\//)[1]),
-      });
-    });
-
-    // console.log(data);
+    let data = pokemonList.data.results.map((val) => ({
+      id: parseInt(val.url.match(/\/pokemon\/(\d+)\//)[1]),
+    }));
 
     let pokeList = [];
-    pokeList = data.map(async (val, index) => {
-      let poke = await fetchPokemonById(val.id);
-      console.log(poke.data);
-      return poke.data;
-    });
 
-    return {
+    pokeList = await Promise.all(
+      data.map(async (val) => {
+        try {
+          let url = `http://localhost:8000/api/pokemon/byId/${val.id}`;
+          let response = await axios.get(url);
+          return response.data.data;
+        } catch (error) {
+          return null;
+        }
+      })
+    );
+
+    // console.log(pokeList);
+
+    pokeList = pokeList.filter((poke) => poke !== null);
+
+    res.status(200).json({
+      message: "All data fetched.",
       data: pokeList,
-      status: 200,
-      count: data.length,
-      test: "",
-    };
+    });
   } catch (error) {
-    throw new Error("500: Fehler im Bearbeiten der Pokemondaten.", error);
+    throw new ErrorResponse(
+      `Fehler im Bearbeiten der Pokemondaten: ${error.message}`,
+      500
+    );
   }
-}
+});
 
-export async function fetchPokemonById(id = 0) {
+export const fetchPokemonById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  console.log(id);
   try {
     const pokemon = await axios.get(`${pokeUrl}/pokemon/${id}`);
 
@@ -79,16 +97,19 @@ export async function fetchPokemonById(id = 0) {
       throw new Error("400: Pokemon nicht gefunden.");
     }
 
-    const poke_info = extractDataFromPokemonData(pokemon.data);
+    const data = extractDataFromPokemonData(pokemon.data);
 
-    return { data: poke_info, status: 200 };
+    res.status(200).json({
+      message: `Fetched all Data from Pokemon with id: ${id}`,
+      data,
+    });
   } catch (error) {
     throw new Error(
       `500: Fehler im Bearbeiten der Pokemondaten mit id ${id}`,
       error
     );
   }
-}
+});
 
 function extractDataFromPokemonData(pokemon) {
   let poke = {
