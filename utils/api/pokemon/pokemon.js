@@ -51,10 +51,20 @@ export async function fetchAllPokemonPerPage(page = 1, perPage = pokePerPage) {
       });
     });
 
+    // console.log(data);
+
+    let pokeList = [];
+    pokeList = data.map(async (val, index) => {
+      let poke = await fetchPokemonById(val.id);
+      console.log(poke.data);
+      return poke.data;
+    });
+
     return {
-      data: data,
+      data: pokeList,
       status: 200,
       count: data.length,
+      test: "",
     };
   } catch (error) {
     throw new Error("500: Fehler im Bearbeiten der Pokemondaten.", error);
