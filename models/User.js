@@ -44,8 +44,7 @@ const UserSchema = new Schema({
         required: true,
         default: 0,
     },
-    timestamps: true,
-});
+},{timestamps: true});
 
 UserSchema.pre("save", async function (next){
     if(!this.isModified("password")) return next();
