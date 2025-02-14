@@ -1,8 +1,4 @@
-import {
-  generateAccessToken,
-  generateRefreshToken,
-  generateToken,
-} from "../utils/token/tokenGenerator.js";
+import {generateToken} from "../utils/token/tokenGenerator.js";
 import TokenModel from "../models/Token.js";
 import asyncHandler from "../utils/handler/asyncHandler.js";
 import UserModel from "../models/User.js";
