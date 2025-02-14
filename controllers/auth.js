@@ -1,8 +1,4 @@
-import {
-  generateAccessToken,
-  generateRefreshToken,
-  generateToken,
-} from "../utils/token/tokenGenerator.js";
+import {generateToken} from "../utils/token/tokenGenerator.js";
 import TokenModel from "../models/Token.js";
 import asyncHandler from "../utils/handler/asyncHandler.js";
 import UserModel from "../models/User.js";
@@ -11,13 +7,13 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
 export const registration = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-  const existingUser = await UserModel.findOne({ email });
+    const {username, email, password} = req.body;
+    const existingUser = await UserModel.findOne({email});
 
-  if (existingUser) throw new ErrorResponse("User already exist", 400);
+    if (existingUser) throw new ErrorResponse('User already exist', 400);
 
-  await UserModel.create({ email, password });
-  res.status(201).json({ message: "User registered successfully" });
+    await UserModel.create({username, email, password});
+    res.status(201).json({message: "User registered successfully"});
 });
 
 export const login = asyncHandler(async (req, res) => {
