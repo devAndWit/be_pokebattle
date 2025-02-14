@@ -7,13 +7,12 @@ export const authenticate = asyncHandler(async (req, res, next) => {
         const token = req.header("Authorization")?.split(" ")[1];
 
         if (!token) {
-            return next(new ErrorResponse("Access denied", 401)); // ✅ `return next(error)`, а не `throw`
+            return next(new ErrorResponse("Access denied", 401));
         }
-
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
         next();
     } catch (error) {
-        return next(new ErrorResponse("Invalid token", 403)); // ✅ Обрабатываем неверный токен
+        return next(new ErrorResponse("Invalid token", 403));
     }
 });

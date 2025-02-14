@@ -20,10 +20,10 @@ const generateToken = async (userId) => {
 };
 
 export const registration = asyncHandler(async (req, res) => {
-    const {email, password} = req.body;
+    const {username, email, password} = req.body;
     const existingUser = await UserModel.findOne({email});
     if (existingUser) throw new ErrorResponse('User already exist', 400);
-    await UserModel.create({email, password});
+    await UserModel.create({username, email, password});
     res.status(201).json({message: "User registered successfully"});
 });
 

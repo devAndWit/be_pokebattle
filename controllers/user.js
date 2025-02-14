@@ -28,17 +28,19 @@ const getUserPokemonList = asyncHandler(async (req, res) => {
     const user = await UserModel.findById(id).select("pokemonList").lean();
 
     if (!user) throw new ErrorResponse("User not found", 404);
-    res.json(user.pokemonList)
+    res.json(user)
 });
 
 const getTopUsers = asyncHandler(async (req, res) => {
+
     const topUsers = await UserModel.find()
         .sort({rating: -1})
         .limit(10)
         .select("_id username rating")
         .lean();
 
-    res.json({topUsers})
+    res.json(topUsers)
+    console.log("response")
 });
 
 export {getUserPokemonList, getTopUsers, getAllUsers, getUserById};
