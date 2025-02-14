@@ -10,6 +10,7 @@ import authRouter from "./routes/authRoutes.js";
 import userRouter from "./routes/userRoutes.js";
 
 import pokemonRouter from "./routes/pokemonApiRoutes.js";
+import battleHistoryRouter from "./routes/battleHistoryRoutes.js";
 
 const app = express();
 const morganFormat = ":method :url :status :response-time ms";
@@ -35,8 +36,9 @@ app.use(express.json());
 
 // app.use('/{route}', {router});
 app.use("/api/auth", authRouter)
-app.use("/user", userRouter)
+app.use("/user", userRouter);
 app.use("/api/pokemon", pokemonRouter);
+app.use("/battle-history", battleHistoryRouter);
 
 app.use("*", (req, res, next) => {
   next(new ErrorResponse(`Cannot find ${req.originalUrl}`, 404));
