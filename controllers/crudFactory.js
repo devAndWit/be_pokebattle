@@ -4,7 +4,7 @@ import ErrorResponse from "../utils/error/ErrorResponse.js";
 const getAll = (Model) =>
     asyncHandler(async (req, res, next) => {
         const data = await Model.find().lean();
-        res.json({data});
+        res.json(data);
     });
 
 const getOneById = (Model) =>
@@ -12,13 +12,13 @@ const getOneById = (Model) =>
         const { id } = req.params;
         const data = await Model.findById(id).lean();
         if (!data) throw new ErrorResponse(`${Model.modelName} not found`, 404);
-        res.json({data});
+        res.json(data);
     });
 
 const createOne = (Model) =>
     asyncHandler(async (req, res, next) => {
         const data = await Model.create(req.body);
-        res.status(201).json({data});
+        res.status(201).json(data);
     });
 
 const updateOne = (Model) =>

@@ -8,10 +8,12 @@ const userRouter = Router();
 
 userRouter.get("/", authenticate, getAllUsers);
 userRouter.get("/topUsers", getTopUsers);
-userRouter.get("/:id", authenticate, getUserById);
+userRouter
+    .get("/:id", authenticate, getUserById)
+    .put("/:id", authenticate, updateOne(UserModel))
+    .delete("/:id", authenticate, deleteOne(UserModel));
+
 userRouter.get("/pokemonList/:id", authenticate, getUserPokemonList);
 
-userRouter.put("/:id", authenticate, updateOne(UserModel));
-userRouter.delete("/:id", authenticate, deleteOne(UserModel));
 
 export default userRouter;
