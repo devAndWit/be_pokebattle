@@ -27,7 +27,7 @@ export const login = asyncHandler(async (req, res) => {
   if (!isMatch) throw new ErrorResponse("Invalid credentials", 400);
 
   const tokens = await generateToken(user._id);
-  res.json(tokens);
+  res.json({userId: user._id, tokens});
 });
 
 export const refreshAccessToken = asyncHandler(async (req, res) => {
@@ -41,8 +41,6 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
 
   const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
   const tokens = await generateToken(decoded.userId);
-
-  await TokenModel.deleteOne({ refreshToken: refreshToken });
 
   res.json(tokens);
 });

@@ -34,13 +34,9 @@ export const fetchAllPokemon = asyncHandler(async (req, res) => {
 });
 
 export const fetchAllPokemonPerPage = asyncHandler(async (req, res) => {
-  console.log("fetchAllPokemonPerPage");
   const { page } = req.params;
 
   const perPage = !req.params.perPage ? 20 : req.params.perPage;
-
-  console.log("page: ", page);
-  console.log("perPage: ", perPage);
 
   try {
     let start = (page - 1) * perPage; // Offset korrekt berechnet
@@ -89,7 +85,7 @@ export const fetchAllPokemonPerPage = asyncHandler(async (req, res) => {
 
 export const fetchPokemonById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  console.log(id);
+
   try {
     const pokemon = await axios.get(`${pokeUrl}/pokemon/${id}`);
 
